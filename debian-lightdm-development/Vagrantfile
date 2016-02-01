@@ -83,7 +83,11 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes lightdm lightdm-gtk-greeter
 
     # xserver-xephyr is a nested X server and useful for testing LightDM in test mode.
-    DEBIAN_FRONTEND=noninteractive apt-get install xserver-xephyr
+    # LightDM's GTK greeter is designed with glade, install it to ease development.
+    DEBIAN_FRONTEND=noninteractive apt-get install xserver-xephyr glade
+
+    # Downloading and installing things have ended, clean the downloaded packages.
+    apt-get clean
 
     # After gettings the dependencies, get the latest source package to the correct place.
     sudo --user=vagrant sh -c 'mkdir --parents /home/vagrant/development/lightdm'

@@ -86,6 +86,9 @@ Vagrant.configure(2) do |config|
      # This is a Debian Installer development machine, so get the debian installer build dependencies.
      DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes debian-installer
 
+     # Downloading and installing things have ended, clean the downloaded packages.
+     apt-get clean
+
      # Make the required folders and get the debian installer source code.
      mkdir --parents /root/development/debian-installer
      svn checkout svn://anonscm.debian.org/svn/d-i/trunk /root/development/debian-installer/debian-installer
