@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.95"
+  config.vm.network "private_network", ip: "192.168.56.94"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -44,16 +44,10 @@ Vagrant.configure(2) do |config|
   # Example for VirtualBox:
   #
    config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
-
     # Change the network cards to VirtIO for better performance:
     # Two network cards since I also have a host-only network.
     vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
     vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
-  
-    # Customize the amount of memory on the VM:
-    vb.memory = "2536"
    end
   #
   # View the documentation for the provider you are using for more
@@ -77,24 +71,10 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
     # Then install the packages that we need to work with.
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64 task-xfce-desktop
-
-    # Also install the build dependencies for the lightdm
-    DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes lightdm lightdm-gtk-greeter
-
-    # xserver-xephyr is a nested X server and useful for testing LightDM in test mode.
-    # LightDM's GTK greeter is designed with glade, install it to ease development.
-    # To repackage the lightdm-*, we need packaging-dev.
-    DEBIAN_FRONTEND=noninteractive apt-get install xserver-xephyr glade packaging-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
 
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
-
-    # After gettings the dependencies, get the latest source package to the correct place.
-    sudo --user=vagrant sh -c 'mkdir --parents /home/vagrant/development/lightdm'
-    sudo --user=vagrant sh -c 'mkdir --parents /home/vagrant/development/lightdm-gtk-greeter'
-    sudo --user=vagrant sh -c 'cd /home/vagrant/development/lightdm && apt-get source lightdm'
-    sudo --user=vagrant sh -c 'cd /home/vagrant/development/lightdm-gtk-greeter && apt-get source lightdm-gtk-greeter'
 
     # Make downloads folder, so things stay tidy.
     mkdir --parents /root/downloads
