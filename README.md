@@ -8,3 +8,4 @@ Currently contains the following VMs
 - **debian-xfce-development:** Debian Jessie 64bit which updates itself and installs `task-xfce-desktop` metapackage. Suited for working on XFCE desktop components or as a general purpose VM.
 - **debian-lightdm-development:** Debian Jessie 64bit which updates itself and installs `task-xfce-desktop` metapackage. Also installs build dependencies of `lightdm` and downloads its latest source deb for lightdm development.
 - **debian-selinux-development:** Debian Jessie 64bit which updates itself and installs a permissive SELinux environment with reference policy from Debian Unstable.
+- **debian-ldap-development:** Debian Jessie 64bit which updates itself and installs `slapd` (OpenLDAP server) and `ldap-utils` package. Designed to assist in development of LDAP schemas and related things. Redirects port 389 to 38983 on host.
