@@ -14,8 +14,8 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "debian/jessie64"
 
-  # Give a proper hostname to the box
-  config.vm.hostname = "installer-development"
+  # Set the hostname of the system
+  config.vm.hostname = "docker-lab"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.96", nic_type: 'virtio'
+  config.vm.network "private_network", ip: "192.168.56.91"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -46,9 +46,9 @@ Vagrant.configure(2) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    # vb.gui = true
+    #vb.gui = true
 
     # Change the network cards to VirtIO for better performance:
     # Two network cards since I also have a host-only network.
@@ -56,14 +56,14 @@ Vagrant.configure(2) do |config|
     vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
 
     # Enable USB 2.0 controllers on the VM
-    # vb.customize ['modifyvm', :id, '--usbehci', 'on']
+    #vb.customize ['modifyvm', :id, '--usbehci', 'on']
 
     # Enable sound on the guest
-    # vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
-
+    #vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
+  
     # Customize the amount of memory on the VM:
-    # vb.memory = "2536"
-  # end
+    #vb.memory = "2536"
+   end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -79,25 +79,44 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
-     # First update the repositories and upgrade the distribution.
-     apt-get update
-     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
+    # Update repositiories before installing anything.
+    apt-get update
 
-     # Then install my favorite packages.
-     DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64 subversion
+    # Update system to latest packages.
+    DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
-     # This is a Debian Installer development machine, so get the debian installer build dependencies.
-     DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes debian-installer
+    # Then install the packages that we need to work with.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
 
-     # Downloading and installing things have ended, clean the downloaded packages.
-     apt-get clean
+    # Downloading and installing things have ended, clean the downloaded packages.
+    apt-get clean
+    
+    # Start installing docker according to official howto.
+    # Get the preliminary packages
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-transport-https ca-certificates
 
-     # Make the required folders and get the debian installer source code.
-     mkdir --parents /root/development/debian-installer
-     svn checkout svn://anonscm.debian.org/svn/d-i/trunk /root/development/debian-installer/debian-installer
+    # Get the required repository keys
+    apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
-     # I generally use virtualbox, so I download the Virtualbox Extensions CD.
-     mkdir --parents /root/downloads
-     wget --no-verbose --directory-prefix=/root/downloads 'http://download.virtualbox.org/virtualbox/5.0.20/VBoxGuestAdditions_5.0.20.iso'
+    # Add the repository
+    echo "deb https://apt.dockerproject.org/repo debian-jessie main" > /etc/apt/sources.list.d/docker-official-repository.list
+
+    # Update the repository lists again
+    apt-get update
+
+    # Now install docker
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-engine
+
+    # Downloading and installing things have ended, clean the downloaded packages.
+    apt-get clean
+
+    # Enable docker to run at startup
+    systemctl enable docker
+
+    # Make downloads folder, so things stay tidy.
+    mkdir --parents /root/downloads
+
+    # Download the VirtualBox guest additions, so we can install them after logging in.
+    wget --no-verbose --directory-prefix=/root/downloads 'http://download.virtualbox.org/virtualbox/5.0.20/VBoxGuestAdditions_5.0.20.iso'
    SHELL
 end

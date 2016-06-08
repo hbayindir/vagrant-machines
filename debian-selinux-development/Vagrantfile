@@ -14,6 +14,9 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "debian/jessie64"
 
+  # Give a proper hostname to the box
+  config.vm.hostname = "selinux-development"
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -56,7 +59,7 @@ Vagrant.configure(2) do |config|
 
     # Enable sound on the guest
     #vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
-  
+
     # Customize the amount of memory on the VM:
     #vb.memory = "2536"
    end

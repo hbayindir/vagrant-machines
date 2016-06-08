@@ -14,6 +14,9 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "debian/jessie64"
 
+  # Give a proper hostname to the box
+  config.vm.hostname = "lightdm-development"
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -51,7 +54,7 @@ Vagrant.configure(2) do |config|
     # Two network cards since I also have a host-only network.
     vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
     vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
-  
+
     # Customize the amount of memory on the VM:
     vb.memory = "2536"
    end

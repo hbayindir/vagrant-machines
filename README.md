@@ -10,6 +10,7 @@ Currently contains the following VMs
 - **debian-selinux-development:** Debian Jessie 64bit which updates itself and installs a permissive SELinux environment with reference policy from Debian Unstable. Also downloads MLS policy, policy documentation, development packages and reference policy source.
 - **debian-ldap-development:** Debian Jessie 64bit which updates itself and installs `slapd` (OpenLDAP server) and `ldap-utils` package. Designed to assist in development of LDAP schemas and related things. Redirects port 389 to 38983 on host. You need to run `dpkg-reconfigure slapd` once to configure your LDAP server after provisioning to set its specifics.
 - **debian-squid-server:** Debian Jessie 64bit which updates itself and installs an unconfigured `squid3` server.
+- **debian-docker-lab:** Debian Jessie 64bit which updates itself and installs latest `docker` from official repositories.
 
 ## Private IP List
 Following list contains the Private IP addresses of the host-only networking interfaces of the machines.
@@ -19,3 +20,4 @@ Following list contains the Private IP addresses of the host-only networking int
 - **debian-selinux-development:** `192.168.56.94`
 - **debian-ldap-development:** `192.168.56.93`
 - **debian-squid-server:** `192.168.56.92`
+- **debian-docker-lab:** `192.168.56.91`
