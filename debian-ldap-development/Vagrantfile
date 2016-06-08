@@ -17,6 +17,9 @@ Vagrant.configure(2) do |config|
   # Give a proper hostname to the box
   config.vm.hostname = "ldap-development"
 
+  # This machine needs some post-work after provisioning. Let's tell
+  config.vm.post_up_message = "If you didn't do already, please run dpkg-reconfigure slapd to configure your LDAP server."
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
