@@ -95,9 +95,5 @@ Vagrant.configure(2) do |config|
      # Make the required folders and get the debian installer source code.
      mkdir --parents /root/development/debian-installer
      svn checkout svn://anonscm.debian.org/svn/d-i/trunk /root/development/debian-installer/debian-installer
-
-     # I generally use virtualbox, so I download the Virtualbox Extensions CD.
-     mkdir --parents /root/downloads
-     wget --no-verbose --directory-prefix=/root/downloads 'http://download.virtualbox.org/virtualbox/5.0.20/VBoxGuestAdditions_5.0.20.iso'
    SHELL
 end

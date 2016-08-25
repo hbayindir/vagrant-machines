@@ -14,8 +14,8 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "debian/jessie64"
 
-  # Give a proper hostname to the box
-  config.vm.hostname = "lightdm-development"
+  # Set the hostname of the system
+  config.vm.hostname = "custom-image-builder"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.95"
+  config.vm.network "private_network", ip: "192.168.56.90"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -48,22 +48,21 @@ Vagrant.configure(2) do |config|
   #
    config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
-
-    # Enable 3D Acceleration
-    vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-
-    # Give some VRAM to ease things off.
-    vb.customize ["modifyvm", :id, "--vram", "96"]
-
+    #vb.gui = true
 
     # Change the network cards to VirtIO for better performance:
     # Two network cards since I also have a host-only network.
     vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
     vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
 
+    # Enable USB 2.0 controllers on the VM
+    #vb.customize ['modifyvm', :id, '--usbehci', 'on']
+
+    # Enable sound on the guest
+    #vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
+  
     # Customize the amount of memory on the VM:
-    vb.memory = "2536"
+    vb.memory = "1024"
    end
   #
   # View the documentation for the provider you are using for more
@@ -87,23 +86,49 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
     # Then install the packages that we need to work with.
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64 task-xfce-desktop devscripts git
-
-    # Also install the build dependencies for the lightdm
-    DEBIAN_FRONTEND=noninteractive apt-get build-dep --yes lightdm lightdm-gtk-greeter
-
-    # xserver-xephyr is a nested X server and useful for testing LightDM in test mode.
-    # LightDM's GTK greeter is designed with glade, install it to ease development.
-    # To repackage the lightdm-*, we need packaging-dev.
-    DEBIAN_FRONTEND=noninteractive apt-get install xserver-xephyr glade packaging-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
 
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
 
-    # After gettings the dependencies, get the latest source package to the correct place.
-    sudo --user=vagrant sh -c 'mkdir --parents /home/vagrant/development/lightdm'
-    sudo --user=vagrant sh -c 'mkdir --parents /home/vagrant/development/lightdm-gtk-greeter'
-    sudo --user=vagrant sh -c 'cd /home/vagrant/development/lightdm && apt-get source lightdm'
-    sudo --user=vagrant sh -c 'cd /home/vagrant/development/lightdm-gtk-greeter && apt-get source lightdm-gtk-greeter'
+    # Get tools required for general development
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes git
+    
+    # Start installing building tools for repository management.
+    # Get the latest aptly.
+    apt-key adv --keyserver keys.gnupg.net --recv-keys 9E3E53F19C7DE460
+
+    # Add the repository for aptly.
+    echo "deb http://repo.aptly.info/ squeeze main" > /etc/apt/sources.list.d/aptly.list
+
+    # Update repository list
+    apt-get update
+
+    # Install aptly
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes aptly
+
+    # Get the latest ftpsync snapshot from official git repository
+    git clone https://ftp-master.debian.org/git/archvsync.git /root/ftpsync
+
+    # Get the debian-cd package.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes debian-cd
+
+    # Add the Stretch repository for live-build.
+    echo "deb http://ftp.de.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list.d/debian-stretch.list
+
+    # Update the repository lists again
+    apt-get update
+
+    # Lastly, download the live-build from Stretch repository.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes live-build
+
+    # After installing disable the Stretch repository
+    sed -i -e 's/^/#/' /etc/apt/sources.list.d/debian-stretch.list
+
+    # Clean all downloaded packages
+    apt-get clean
+
+    # And update the repository caches
+    apt-get update
    SHELL
 end

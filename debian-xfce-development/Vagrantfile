@@ -90,11 +90,5 @@ Vagrant.configure(2) do |config|
 
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
-
-    # Make downloads folder, so things stay tidy.
-    mkdir --parents /root/downloads
-
-    # Download the VirtualBox guest additions, so we can install them after logging in.
-    wget --no-verbose --directory-prefix=/root/downloads 'http://download.virtualbox.org/virtualbox/5.0.20/VBoxGuestAdditions_5.0.20.iso'
    SHELL
 end
