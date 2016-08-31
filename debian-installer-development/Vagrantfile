@@ -97,10 +97,8 @@ Vagrant.configure(2) do |config|
      svn checkout svn://anonscm.debian.org/svn/d-i/trunk /root/development/debian-installer/debian-installer
 
      # We need some postprocessing for Debian Installer to finish its checkout.
-     cd /root/development/debian-installer/debian-installer/scripts
-     ./git-setup
+     cd /root/development/debian-installer/debian-installer
+     scripts/git-setup
      mr -p checkout
-     
-     
    SHELL
 end
