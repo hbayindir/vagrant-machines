@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "debian/jessie64"
+  config.vm.box = "debian/stretch64"
 
   # Set the hostname of the system
   config.vm.hostname = "docker-lab"
@@ -62,7 +62,7 @@ Vagrant.configure(2) do |config|
     #vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
   
     # Customize the amount of memory on the VM:
-    #vb.memory = "2536"
+    vb.memory = "2536"
    end
   #
   # View the documentation for the provider you are using for more
@@ -93,19 +93,19 @@ Vagrant.configure(2) do |config|
     
     # Start installing docker according to official howto.
     # Get the preliminary packages
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-transport-https ca-certificates
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-transport-https ca-certificates curl gnupg2 software-properties-common
 
     # Get the required repository keys
-    apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 
     # Add the repository
-    echo "deb https://apt.dockerproject.org/repo debian-jessie main" > /etc/apt/sources.list.d/docker-official-repository.list
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 
     # Update the repository lists again
     apt-get update
 
     # Now install docker
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-engine
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-ce
 
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
