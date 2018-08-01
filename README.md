@@ -13,6 +13,7 @@ Currently contains the following VMs
 - **debian-docker-lab:** Debian Stretch 64bit which updates itself and installs latest [docker](https://www.docker.com/) from official repositories. RAM is set to 2536MB (2.5GB) to make sure it can run some containers.
 - **debian-custom-image-builder:** Debian Jessie 64bit which updates itself and installs packages and tools required to create custom debian installation media (both classic and live variants). Live image building tools are taken from Stretch.
 - **debian-grive-builder:** Debian Stretch 64bit which updates itself and installs packages and tools required to build [grive](https://github.com/Grive/grive) Google Drive client. After the machine is up, the client can be directly built (see the post-up message).
+- **debian-openvpn-openldap:** Debian Stretch 64bit which updates itself and installs `OpenVPN`, `OpenLDAP` and `PHP LDAP Admin`. Designed to be a VPN server which authenticates from LDAP.
 
 ## Private IP List
 Following list contains the Private IP addresses of the host-only networking interfaces of the machines.
@@ -25,3 +26,4 @@ Following list contains the Private IP addresses of the host-only networking int
 - **debian-docker-lab:** `192.168.56.91`
 - **debian-custom-image-builder:** `192.168.56.90`
 - **debian-grive-builder:** `192.168.56.89`
+- **debian-openvpn-openldap:** `192.168.56.88`
