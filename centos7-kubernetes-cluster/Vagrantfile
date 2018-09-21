@@ -1,0 +1,138 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # This is a multi-machine setup, we define & configure the machines here.
+  config.vm.define "master", primary: true do |master|
+    master.vm.box = "centos/7"
+    master.vm.network "private_network", ip: "192.168.56.87"
+    master.vm.hostname = "master"
+    
+    master.vm.provider "virtualbox" do |vb|
+      # Change the network cards to VirtIO for better performance:
+      # Two network cards since I also have a host-only network.
+      vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
+      vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
+
+      # Customize the amount of memory on the VM:
+      vb.memory = "2536"
+    end
+
+    master.vm.provision "shell", inline: <<-SHELL
+      # Start with updating the whole system.
+      yum -y update
+
+      # Install EPEL repository.
+      yum -y install epel-release
+
+      # Now install some useful packages.
+      yum -y install vim screen ncftp
+
+      ### Install Docker CE ###
+      # Start with prerequisites.
+      yum -y install yum-utils device-mapper-persistent-data lvm2
+
+      # Add the Docker CE repository.
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+      # Install Docker CE.
+      yum -y install docker-ce
+
+      # Enable and start Docker service.
+      systemctl enable docker
+      systemctl start docker
+
+      echo "Master is up!"
+    SHELL
+  end
+
+  config.vm.define "node1" do |node1|
+    node1.vm.box = "centos/7"
+    node1.vm.network "private_network", ip: "192.168.56.86"
+    node1.vm.hostname = "node-1"
+
+    node1.vm.provider "virtualbox" do |vb|
+      # Change the network cards to VirtIO for better performance:
+      # Two network cards since I also have a host-only network.
+      vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
+      vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
+
+      # Customize the amount of memory on the VM:
+      vb.memory = "2536"
+    end
+    
+    node1.vm.provision "shell", inline: <<-SHELL
+      # Start with updating the whole system.
+      yum -y update
+
+      # Install EPEL repository.
+      yum -y install epel-release
+
+      # Now install some useful packages.
+      yum -y install vim screen ncftp
+
+      ### Install Docker CE ###
+      # Start with prerequisites.
+      yum -y install yum-utils device-mapper-persistent-data lvm2
+
+      # Add the Docker CE repository.
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+      # Install Docker CE.
+      yum -y install docker-ce
+
+      # Enable and start Docker service.
+      systemctl enable docker
+      systemctl start docker
+      
+      echo "Node 1 is up!"
+    SHELL
+  end
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  # config.vm.box = "debian/stretch64"
+
+  # Set the hostname of the system
+  # config.vm.hostname = "docker-lab"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.56.91"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  # <! Insert shell commands here !>
+  #  SHELL
+end
