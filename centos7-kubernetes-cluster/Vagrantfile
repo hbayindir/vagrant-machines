@@ -1,0 +1,180 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # This is a multi-machine setup, we define & configure the machines here.
+  config.vm.define "master", primary: true do |master|
+    master.vm.box = "centos/7"
+    master.vm.network "private_network", ip: "192.168.56.87"
+    master.vm.hostname = "master"
+    
+    master.vm.provider "virtualbox" do |vb|
+      # Change the network cards to VirtIO for better performance:
+      # Two network cards since I also have a host-only network.
+      vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
+      vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
+
+      # Customize the amount of memory on the VM:
+      vb.memory = "2536"
+    end
+
+    master.vm.provision "shell", inline: <<-SHELL
+      # Start with updating the whole system.
+      yum -y update
+
+      # Install EPEL repository.
+      yum -y install epel-release
+
+      # Now install some useful packages.
+      yum -y install vim screen ncftp
+
+      ### Install Docker CE ###
+      # Start with prerequisites.
+      yum -y install yum-utils device-mapper-persistent-data lvm2
+
+      # Add the Docker CE repository.
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+      # Install Docker CE.
+      yum -y install docker-ce
+
+      # Enable and start Docker service.
+      systemctl enable docker
+      systemctl start docker
+
+      ### Starting installation of Kubernetes. ###
+      # The following steps are mirrored from the TechRepublic HowTo which is here:
+      # https://www.techrepublic.com/article/how-to-install-a-kubernetes-cluster-on-centos-7/
+      # Since Docker is installed above, that part of the howto is omitted.
+
+      # Disabling SELinux
+      setenforce 0
+      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+      # Normally Kubernetes doesn't want any swaps on the system, however Vagrant machines already devoid of it.
+      # So, skipping the steps for disabling swap(s).
+      # swapoff -a
+      # Also remove any swap mounting lines from /etc/fstab here.
+      
+      # We need to enable br_netfilter.
+      # Normally minimal installation enables it out of the box, but this Vagrant box doesn't.
+      # No worries, we can do it here.
+      modprobe br_netfilter
+      echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+      # Let's make the changes permanent, then.
+      # Set the br_netfilter module to load on boot.
+      echo 'br_netfilter' > /etc/modules-load.d/br_netfilter.conf
+
+      # Also enable the net.bridge.bridge-nf-call-iptables
+      echo 'net.bridge.bridge-nf-call-iptables = 1' > 98-net-bridge-nf-call-iptables.conf
+
+      # Lastly add the Kubernetes repo, and install Kubernetes.
+      cp /vagrant/kubernetes.repo /etc/yum.repos.d/
+
+      # Install kubernetes to the node:
+      yum install -y kubelet kubeadm kubectl
+
+      # Move Kubernetes and Docker into the same control group (cgroup).
+      sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+      # As the last step, reload the systemctl and restart the kubelet to reflect CGroup changes.
+      systemctl daemon-reload
+      systemctl restart kubelet
+    SHELL
+
+    master.vm.post_up_message = "Kubernetes master is up and running."
+
+  end
+
+  config.vm.define "node1" do |node1|
+    node1.vm.box = "centos/7"
+    node1.vm.network "private_network", ip: "192.168.56.86"
+    node1.vm.hostname = "node-1"
+
+    node1.vm.provider "virtualbox" do |vb|
+      # Change the network cards to VirtIO for better performance:
+      # Two network cards since I also have a host-only network.
+      vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
+      vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
+
+      # Customize the amount of memory on the VM:
+      vb.memory = "2536"
+    end
+    
+    node1.vm.provision "shell", inline: <<-SHELL
+      # Start with updating the whole system.
+      yum -y update
+
+      # Install EPEL repository.
+      yum -y install epel-release
+
+      # Now install some useful packages.
+      yum -y install vim screen ncftp
+
+      ### Install Docker CE ###
+      # Start with prerequisites.
+      yum -y install yum-utils device-mapper-persistent-data lvm2
+
+      # Add the Docker CE repository.
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+      # Install Docker CE.
+      yum -y install docker-ce
+
+      # Enable and start Docker service.
+      systemctl enable docker
+      systemctl start docker
+
+      ### Starting installation of Kubernetes. ###
+      # Disabling SELinux
+      setenforce 0
+      sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+      
+      # Normally Kubernetes doesn't want any swaps on the system, however Vagrant machines already devoid of it.
+      # So, skipping the steps for disabling swap(s).
+      # swapoff -a
+      # Also remove any swap mounting lines from /etc/fstab here.
+      
+      # We need to enable br_netfilter.
+      # Normally minimal installation enables it out of the box, but this Vagrant box doesn't.
+      # No worries, we can do it here.
+      modprobe br_netfilter
+      echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+      # Let's make the changes permanent, then.
+      # Set the br_netfilter module to load on boot.
+      echo 'br_netfilter' > /etc/modules-load.d/br_netfilter.conf
+
+      # Also enable the net.bridge.bridge-nf-call-iptables
+      echo 'net.bridge.bridge-nf-call-iptables = 1' > 98-net-bridge-nf-call-iptables.conf
+
+      # Lastly add the Kubernetes repo, and install Kubernetes.
+      cp /vagrant/kubernetes.repo /etc/yum.repos.d/
+
+      # Install kubernetes to the node:
+      yum install -y kubelet kubeadm kubectl
+
+      # Move Kubernetes and Docker into the same control group (cgroup).
+      sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+      # As the last step, reload the systemctl and restart the kubelet to reflect CGroup changes.
+      systemctl daemon-reload
+      systemctl restart kubelet
+    SHELL
+
+    node1.vm.post_up_message = "Node 1 is up and running."
+
+  end
+
+  config.vm.post_up_message = "Your Kubernetes cluster is up and ready to be configured. Master IP address is 192.168.56.87, and node IP address is 192.168.56.86. While all Kubernetes packages are installed, cluster and its network is not configured yet. These parts are up to you. A small tutorial can be found on https://tek.io/2OeLHZC. Since SELinux is freshly disabled on all nodes, you may need to reboot them prior to configuration. Happy hacking!"
+
+end
