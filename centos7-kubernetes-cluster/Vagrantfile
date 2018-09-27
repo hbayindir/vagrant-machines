@@ -59,10 +59,10 @@ Vagrant.configure(2) do |config|
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-      # Normally Kubernetes doesn't want any swaps on the system, however Vagrant machines already devoid of it.
-      # So, skipping the steps for disabling swap(s).
-      # swapoff -a
+      # Kubernetes doesn't want any swaps on the system.
+      swapoff -a
       # Also remove any swap mounting lines from /etc/fstab here.
+      sed -i.bak -r 's/(.+ swap .+)/#\1/' /etc/fstab
       
       # We need to enable br_netfilter.
       # Normally minimal installation enables it out of the box, but this Vagrant box doesn't.
@@ -82,6 +82,9 @@ Vagrant.configure(2) do |config|
 
       # Install kubernetes to the node:
       yum install -y kubelet kubeadm kubectl
+
+      # Enable kubeadm service.
+      systemctl enable kubelet
 
       # Move Kubernetes and Docker into the same control group (cgroup).
       sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
@@ -139,10 +142,10 @@ Vagrant.configure(2) do |config|
       setenforce 0
       sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
       
-      # Normally Kubernetes doesn't want any swaps on the system, however Vagrant machines already devoid of it.
-      # So, skipping the steps for disabling swap(s).
-      # swapoff -a
+      # Kubernetes doesn't want any swaps on the system.
+      swapoff -a
       # Also remove any swap mounting lines from /etc/fstab here.
+      sed -i.bak -r 's/(.+ swap .+)/#\1/' /etc/fstab
       
       # We need to enable br_netfilter.
       # Normally minimal installation enables it out of the box, but this Vagrant box doesn't.
@@ -162,6 +165,9 @@ Vagrant.configure(2) do |config|
 
       # Install kubernetes to the node:
       yum install -y kubelet kubeadm kubectl
+
+      # Enable kubelet service.
+      systemctl enable kubelet
 
       # Move Kubernetes and Docker into the same control group (cgroup).
       sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
