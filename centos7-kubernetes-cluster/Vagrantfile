@@ -75,7 +75,7 @@ Vagrant.configure(2) do |config|
       echo 'br_netfilter' > /etc/modules-load.d/br_netfilter.conf
 
       # Also enable the net.bridge.bridge-nf-call-iptables
-      echo 'net.bridge.bridge-nf-call-iptables = 1' > 98-net-bridge-nf-call-iptables.conf
+      echo 'net.bridge.bridge-nf-call-iptables = 1' > /etc/sysctl.d/98-net-bridge-nf-call-iptables.conf
 
       # Lastly add the Kubernetes repo, and install Kubernetes.
       cp /vagrant/kubernetes.repo /etc/yum.repos.d/
@@ -155,7 +155,7 @@ Vagrant.configure(2) do |config|
       echo 'br_netfilter' > /etc/modules-load.d/br_netfilter.conf
 
       # Also enable the net.bridge.bridge-nf-call-iptables
-      echo 'net.bridge.bridge-nf-call-iptables = 1' > 98-net-bridge-nf-call-iptables.conf
+      echo 'net.bridge.bridge-nf-call-iptables = 1' > /etc/sysctl.d/98-net-bridge-nf-call-iptables.conf
 
       # Lastly add the Kubernetes repo, and install Kubernetes.
       cp /vagrant/kubernetes.repo /etc/yum.repos.d/
