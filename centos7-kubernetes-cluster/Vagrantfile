@@ -92,6 +92,10 @@ Vagrant.configure(2) do |config|
       # As the last step, reload the systemctl and restart the kubelet to reflect CGroup changes.
       systemctl daemon-reload
       systemctl restart kubelet
+
+      # Last, but not the least, add the hosts to the host file.
+      echo "192.168.56.87 master" >> /etc/hosts
+      echo "192.168.56.86 node-1" >> /etc/hosts
     SHELL
 
     master.vm.post_up_message = "Kubernetes master is up and running."
@@ -175,6 +179,10 @@ Vagrant.configure(2) do |config|
       # As the last step, reload the systemctl and restart the kubelet to reflect CGroup changes.
       systemctl daemon-reload
       systemctl restart kubelet
+      
+      # Last, but not the least, add the hosts to the host file.
+      echo "192.168.56.87 master" >> /etc/hosts
+      echo "192.168.56.86 node-1" >> /etc/hosts
     SHELL
 
     node1.vm.post_up_message = "Node 1 is up and running."
