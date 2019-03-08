@@ -14,6 +14,7 @@ Currently contains the following VMs
 - **debian-custom-image-builder:** Debian Jessie 64bit which updates itself and installs packages and tools required to create custom debian installation media (both classic and live variants). Live image building tools are taken from Stretch.
 - **debian-grive-builder:** Debian Stretch 64bit which updates itself and installs packages and tools required to build [grive](https://github.com/Grive/grive) Google Drive client. After the machine is up, the client can be directly built (see the post-up message).
 - **centos7-kubernetes-cluster:** A pair of CentOS 7 64bit VMs which update themselves, install [docker](https://www.docker.com) and [kubernetes](https://kubernetes.io). The cluster is only installed, but not configured (Please see the post-up message).
+- **centos7-rpm-builder:** A CentOS 7 minimal system which installs and sets up an environment for building `RPM` files from scratch.
 
 ## Private IP List
 Following list contains the Private IP addresses of the host-only networking interfaces of the machines.
@@ -29,3 +30,4 @@ Following list contains the Private IP addresses of the host-only networking int
 - **centos7-kubernetes-cluster:**
   - **`master`:** `192.168.56.87`
   - **`node-1`:** `192.168.56.86`
+- **centos7-rpm-builder:** `192.168.56.85`
