@@ -84,6 +84,6 @@ Vagrant.configure(2) do |config|
 
    SHELL
 
-   config.vm.post_up_message = "Provision of your RPM building VM is complete. It has the latest updates, some essential packages to accelerate your work and the required RPM development packages. If you need any introduction or help with creating RPM packages, you can visit https://rpm-packaging-guide.github.io/ for a excellent guide for everyone."
+   config.vm.post_up_message = "Your RPM building VM is ready. It has the latest updates, some essential packages to accelerate your work and the required RPM development packages. If you need any introduction or help with creating RPM packages, you can visit https://rpm-packaging-guide.github.io/ for a excellent guide for everyone."
 
 end
