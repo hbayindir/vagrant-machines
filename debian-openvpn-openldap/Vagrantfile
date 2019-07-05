@@ -88,9 +88,11 @@ Vagrant.configure(2) do |config|
     # Then install the packages that we need to work with.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
     
-    # Install the packages required for OpenVPN server and its LDAP authentication.
-    # Also install the OpenLDAP server while we're at it.
+    # Install the packages required for OpenLDAP & OpenVPN servers and OpenVPN LDAP authentication.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes slapd openvpn openvpn-auth-ldap
+
+    # These packages are required for local OpenLDAP authentication.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes libnss-ldapd nslcd libpam-ldapd openssl nscd
 
     # Install dnsmasq to provide DNS services to connected hosts.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes dnsmasq
