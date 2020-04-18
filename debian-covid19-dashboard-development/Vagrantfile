@@ -69,6 +69,10 @@ Vagrant.configure(2) do |config|
   #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
   # end
 
+  # Will copy webfs config and .gitconfig to the vm.
+  config.vm.provision "file", source: "./webfsd.conf", destination: "~/webfsd.conf"
+  config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
+
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
@@ -80,19 +84,22 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
     # Then install the basic packages that we need to work comfortably.
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim git screen ncftp mc build-essential linux-headers-amd64 curl
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim git screen ncftp mc build-essential linux-headers-amd64 curl webfs
 
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
 
     # Install the node 12.x from NodeSoruce binary distribution.
     curl -sL https://deb.nodesource.com/setup_12.x | bash -
-    apt-get install -y nodejs
+    apt-get install --yes nodejs
 
     # Lastly, get the source code that we're gonna work with.
-    mkdir git
-    cd git
-    git clone git@github.com:hbayindir/covid-19-turkey.git
+    sudo --user=vagrant sh -c 'mkdir git && cd git && git clone https://github.com/hbayindir/covid-19-turkey.git && cd covid-19-turkey && npm install axios'
 
-    SHELL
+    # Move the webfs config file to its correct place.
+    mv --verbose  ~vagrant/webfsd.conf /etc/webfsd.conf
+    chown --verbose root:root /etc/webfsd.conf
+  SHELL
+
+  config.vm.post_up_message = "Your development VM is ready. If you've just porivisioned the VM, due to a problem in webfs start/stop scripts, please restart your VM with vagrant reload to make new webfs settings take effect, thank you."
 end
