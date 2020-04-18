@@ -15,7 +15,7 @@ Currently contains the following VMs
 - **debian-grive-builder:** Debian Stretch 64bit which updates itself and installs packages and tools required to build [grive](https://github.com/Grive/grive) Google Drive client. After the machine is up, the client can be directly built (see the post-up message).
 - **centos7-kubernetes-cluster:** A pair of CentOS 7 64bit VMs which update themselves, install [docker](https://www.docker.com) and [kubernetes](https://kubernetes.io). The cluster is only installed, but not configured (Please see the post-up message).
 - **centos7-rpm-builder:** A CentOS 7 minimal system which installs and sets up an environment for building `RPM` files from scratch.
-- **debian-covid19-dashboard-development:** Debian Buster 64bit which updates itself and installs the required environment to develop and test [Turkey COVID-19 statistics dashboard](https://github.com/hbayindir/covid-19-turkey).
+- **debian-covid19-dashboard-development:** Debian Buster 64bit which updates itself and installs the required environment plus `webfs` to develop and test [Turkey COVID-19 statistics dashboard](https://github.com/hbayindir/covid-19-turkey). This VM also copies your `~/.gitconfig` to `~` to make development easier.
 
 ## Private IP List
 Following list contains the Private IP addresses of the host-only networking interfaces of the machines.
