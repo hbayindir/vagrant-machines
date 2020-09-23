@@ -3,7 +3,8 @@ Contains commonly used Vagrant machine definitions to easily create VMs ready fo
 
 Otherwise noted, all VMs have virtual networking IPs, run on VirtIO network cards and updates themselves to latest version of the OS automatically. For automatic installation of VirtualBox guest additions, please use `vagrant-vbguest` plugin.
 
-Currently contains the following VMs
+Currently contains the following VMs:
+
 - **debian-xfce-development:** Debian Jessie 64bit which updates itself and installs `task-xfce-desktop` metapackage. Suited for working on XFCE desktop components or as a general purpose VM.
 - **debian-installer-development:** Debian Jessie 64bit which checkouts Debian Installer source repository, installs build dependencies and updates itself.
 - **debian-lightdm-development:** Debian Jessie 64bit which updates itself and installs `task-xfce-desktop` metapackage. Also installs build dependencies of `lightdm` and downloads its latest source deb for lightdm development.
@@ -16,9 +17,11 @@ Currently contains the following VMs
 - **centos7-kubernetes-cluster:** A pair of CentOS 7 64bit VMs which update themselves, install [docker](https://www.docker.com) and [kubernetes](https://kubernetes.io). The cluster is only installed, but not configured (Please see the post-up message).
 - **centos7-rpm-builder:** A CentOS 7 minimal system which installs and sets up an environment for building `RPM` files from scratch.
 - **debian-covid19-dashboard-development:** Debian Buster 64bit which updates itself and installs the required environment plus `webfs` to develop and test [Turkey COVID-19 statistics dashboard](https://github.com/hbayindir/covid-19-turkey). This VM also copies your `~/.gitconfig` to `~` to make development easier.
+- **ubuntu18.04-inveniordm-development:** Ubuntu 18.04 LTS 64 bit which updates itself, installs docker, python, nodejs  and related tools in order to develop [InvenioRDM](https://inveniosoftware.org/products/rdm/).
 
 ## Private IP List
-Following list contains the Private IP addresses of the host-only networking interfaces of the machines.
+Following list contains the Private IP addresses of the host-only networking interfaces of the machines:
+
 - **debian-xfce-development:** `192.168.56.97`
 - **debian-installer-development:** `192.168.56.96`
 - **debian-lightdm-development:** `192.168.56.95`
@@ -29,7 +32,8 @@ Following list contains the Private IP addresses of the host-only networking int
 - **debian-custom-image-builder:** `192.168.56.90`
 - **debian-grive-builder:** `192.168.56.89`
 - **centos7-kubernetes-cluster:**
-  - **`master`:** `192.168.56.87`
-  - **`node-1`:** `192.168.56.86`
+    - **`master`:** `192.168.56.87`
+    - **`node-1`:** `192.168.56.86`
 - **centos7-rpm-builder:** `192.168.56.85`
 - **debian-covid19-dashboard-development:** `192.168.56.84`
+- **ubuntu18.04-inveniordm-development:** `192.168.56.83`
