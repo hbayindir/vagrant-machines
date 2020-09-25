@@ -74,7 +74,7 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
     # Update repositiories before installing anything.
-    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get update
 
     # Update system to latest packages.
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
@@ -82,14 +82,49 @@ Vagrant.configure(2) do |config|
     # Then install the basic packages that we need to work comfortably.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes vim git screen ncftp mc build-essential linux-headers-generic curl dkms
 
+    # We need Python 3.7.x to work reliably with the InvenioRDM. So let's get it.
+    add-apt-repository --yes --update ppa:deadsnakes/ppa
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip
+
+    # Install pipenv to the vagrant user's environment. We're going to need that.
+    sudo --non-interactive --set-home --user vagrant -- pip3 install pipenv
+
+    # Next, install the docker engine (CE version).
+    # Note: The process skips the packages already installed at this point.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-transport-https gnupg-agent
+
+    # Add Docker's GPG key to the system.
+    curl --fail --silent --show-error --location https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    # Add Docker's Ubuntu repository to the system.
+    add-apt-repository --yes --update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+    # Let's update the indexes and get the packages.
+    DEBIAN_FRONTEND=noninteractive apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-ce docker-ce-cli containerd.io
+
+    # Enable docker service and start it.
+    systemctl enable docker --now
+
+    # Add vagrant user to docker group so it can use docker too.
+    usermod --append --groups docker vagrant
+
+    # Also install docker-compose. It's required.
+    curl --fail --silent --show-error --location "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" --output /usr/local/bin/docker-compose
+    chmod --change +x /usr/local/bin/docker-compose
+
+    # Install the node 14.x from NodeSoruce binary distribution.
+    curl --fail --silent --show-error --location "https://deb.nodesource.com/setup_14.x" | bash -
+    apt-get install --yes nodejs
+    
     # Downloading and installing things have ended, clean the downloaded packages.
     apt-get clean
 
-    # Install the node 12.x from NodeSoruce binary distribution.
-    curl -sL https://deb.nodesource.com/setup_14.x | bash -
-    apt-get install --yes nodejs
+    # Install invenio-cli to the user, so everything is ready to develop.
+    cd /home/vagrant
+    sudo --non-interactive --set-home --user vagrant -- .local/bin/pipenv install invenio-cli
 
   SHELL
 
-  config.vm.post_up_message = "Your development VM is ready. If you've just porivisioned the VM, due to a problem in webfs start/stop scripts, please restart your VM with vagrant reload to make new webfs settings take effect, thank you."
+  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pipenv at this point. Enjoy!"
 end
