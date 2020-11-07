@@ -80,7 +80,7 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
     # Update repositiories before installing anything.
-    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get update
 
     # Update system to latest packages.
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
@@ -89,7 +89,7 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
 
     # Downloading and installing things have ended, clean the downloaded packages.
-    apt-get clean
+    DEBIAN_FRONTEND=noninteractive apt-get clean
     
     # Start installing docker according to official howto.
     # Get the preliminary packages
@@ -102,16 +102,22 @@ Vagrant.configure(2) do |config|
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 
     # Update the repository lists again
-    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get update
 
     # Now install docker
     DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-ce
 
     # Downloading and installing things have ended, clean the downloaded packages.
-    apt-get clean
+    DEBIAN_FRONTEND=noninteractive apt-get clean
 
     # Enable docker to run at startup
     systemctl enable docker
 
+    # Add docker-compose to the system
+    curl -fsSL "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
    SHELL
+
+    config.vm.post_up_message = "Your Docker lab is ready. Just SSH and enjoy (please restart once before first use)."
 end
