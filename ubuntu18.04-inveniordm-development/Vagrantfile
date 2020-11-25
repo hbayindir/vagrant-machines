@@ -57,6 +57,10 @@ Vagrant.configure(2) do |config|
 
     # Customize the amount of memory on the VM:
     vb.memory = "6144"
+
+    # Give it more processing power:
+    vb.cpus = "2"
+
    end
   #
   # View the documentation for the provider you are using for more
@@ -84,7 +88,10 @@ Vagrant.configure(2) do |config|
 
     # We need Python 3.7.x to work reliably with the InvenioRDM. So let's get it.
     add-apt-repository --yes --update ppa:deadsnakes/ppa
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip python3.7-dev libpython3.7-dev
+    
+    # We need libcairo2 for developing invenio, so let's install it.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes libcairo2
 
     # Install pipenv to the vagrant user's environment. We're going to need that.
     sudo --non-interactive --set-home --user vagrant -- pip3 install pipenv
@@ -121,10 +128,11 @@ Vagrant.configure(2) do |config|
     apt-get clean
 
     # Install invenio-cli to the user, so everything is ready to develop.
+    # --no-warn-script-location is used since it's a false warning (due to sudo)
     cd /home/vagrant
-    sudo --non-interactive --set-home --user vagrant -- .local/bin/pipenv install invenio-cli
+    sudo --non-interactive --set-home --user vagrant -- .local/bin/pip3 install --user --no-warn-script-location invenio-cli
 
   SHELL
 
-  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pipenv at this point. Enjoy!"
+  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pipenv at this point. Enjoy! (for more information see: https://inveniordm.docs.cern.ch/)"
 end
