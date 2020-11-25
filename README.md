@@ -38,4 +38,4 @@ Following list contains the Private IP addresses of the host-only networking int
 - **centos7-rpm-builder:** `192.168.56.85`
 - **debian-covid19-dashboard-development:** `192.168.56.84`
 - **ubuntu18.04-inveniordm-development:** `192.168.56.83`
-- **debian-minikube-lab:** `192.168.56.83`
+- **debian-minikube-lab:** `192.168.56.82`
