@@ -15,7 +15,7 @@ Vagrant.configure(2) do |config|
   config.vm.box = "debian/stretch64"
 
   # Set the hostname of the system
-  config.vm.hostname = "docker-lab"
+  config.vm.hostname = "minikube-lab"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.91"
+  config.vm.network "private_network", ip: "192.168.56.83"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -62,7 +62,10 @@ Vagrant.configure(2) do |config|
     #vb.customize ["modifyvm", :id, '--audio', 'pulse', '--audiocontroller', 'ac97']
   
     # Customize the amount of memory on the VM:
-    vb.memory = "2536"
+    vb.memory = "6144"
+
+    # Minikube requires two CPUs.
+    vb.cpus = "2"
    end
   #
   # View the documentation for the provider you are using for more
@@ -86,7 +89,7 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
     # Then install the packages that we need to work with.
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64 jq git
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen ncftp mc build-essential linux-headers-amd64
 
     # Downloading and installing things have ended, clean the downloaded packages.
     DEBIAN_FRONTEND=noninteractive apt-get clean
@@ -117,15 +120,14 @@ Vagrant.configure(2) do |config|
     curl -fsSL "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-    
-    # Add docker-machine to the system
-    curl -fsSL https://github.com/docker/machine/releases/download/v0.16.0/docker-machine-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-machine
-    chmod +x /usr/local/bin/docker-machine
-    ln -s /usr/local/bin/docker-machine /usr/bin/docker-machine
 
-    # Add vagrant user to docker group to allow normal-user operation.
+    # Install minikube from official repositories.
+    curl -fsSLO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+    dpkg -i minikube_latest_amd64.deb
+
+    # Add vagrant user to docker group to allow normal-user operation
     usermod -aG docker vagrant
    SHELL
 
-   config.vm.post_up_message = "Your Docker lab is ready. Just SSH and enjoy (please restart once before first use)."
+    config.vm.post_up_message = "Your Minikube lab is ready. Just SSH and enjoy (please restart once before first use).\nFor more information, see https://minikube.sigs.k8s.io/docs/ ."
 end
