@@ -134,5 +134,5 @@ Vagrant.configure(2) do |config|
 
   SHELL
 
-  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pipenv at this point. Enjoy! (for more information see: https://inveniordm.docs.cern.ch/)"
+  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pip at this point. So, it can be directly used. Enjoy! (for more information see: https://inveniordm.docs.cern.ch/)"
 end
