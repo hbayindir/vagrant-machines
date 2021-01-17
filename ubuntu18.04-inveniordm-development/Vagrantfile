@@ -88,7 +88,7 @@ Vagrant.configure(2) do |config|
 
     # We need Python 3.7.x to work reliably with the InvenioRDM. So let's get it.
     add-apt-repository --yes --update ppa:deadsnakes/ppa
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip python3.7-dev libpython3.7-dev
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.8 python3-pip python3.8-dev libpython3.8-dev
     
     # We need libcairo2 for developing invenio, so let's install it.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes libcairo2
