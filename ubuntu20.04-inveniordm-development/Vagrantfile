@@ -1,0 +1,138 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "ubuntu/focal64"
+
+  # Give a proper hostname to the box
+  config.vm.hostname = "inveniordm-devel"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  config.vm.network "private_network", ip: "192.168.56.83"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+   config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    #vb.gui = true
+
+    # Change the network cards to VirtIO for better performance:
+    # Two network cards since I also have a host-only network.
+    vb.customize ["modifyvm", :id, '--nictype1', 'virtio']
+    vb.customize ["modifyvm", :id, '--nictype2', 'virtio']
+
+    # Customize the amount of memory on the VM:
+    vb.memory = "6144"
+
+    # Give it more processing power:
+    vb.cpus = "2"
+
+   end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+   config.vm.provision "shell", inline: <<-SHELL
+    # Update repositiories before installing anything.
+    DEBIAN_FRONTEND=noninteractive apt-get update
+
+    # Update system to latest packages.
+    DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
+
+    # Then install the basic packages that we need to work comfortably.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim git screen ncftp mc build-essential linux-headers-generic curl dkms
+
+    # We need Python 3.7.x to work reliably with the InvenioRDM. So let's get it.
+    add-apt-repository --yes --update ppa:deadsnakes/ppa
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip python3.7-dev libpython3.7-dev
+    
+    # We need libcairo2 for developing invenio, so let's install it.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes libcairo2
+
+    # Install pipenv to the vagrant user's environment. We're going to need that.
+    sudo --non-interactive --set-home --user vagrant -- pip3 install pipenv
+
+    # Next, install the docker engine (CE version).
+    # Note: The process skips the packages already installed at this point.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-transport-https gnupg-agent
+
+    # Add Docker's GPG key to the system.
+    curl --fail --silent --show-error --location https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    # Add Docker's Ubuntu repository to the system.
+    add-apt-repository --yes --update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+    # Let's update the indexes and get the packages.
+    DEBIAN_FRONTEND=noninteractive apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes docker-ce docker-ce-cli containerd.io
+
+    # Enable docker service and start it.
+    systemctl enable docker --now
+
+    # Add vagrant user to docker group so it can use docker too.
+    usermod --append --groups docker vagrant
+
+    # Also install docker-compose. It's required.
+    curl --fail --silent --show-error --location "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" --output /usr/local/bin/docker-compose
+    chmod --change +x /usr/local/bin/docker-compose
+
+    # Install the node 14.x from NodeSoruce binary distribution.
+    curl --fail --silent --show-error --location "https://deb.nodesource.com/setup_14.x" | bash -
+    apt-get install --yes nodejs
+    
+    # Downloading and installing things have ended, clean the downloaded packages.
+    apt-get clean
+
+    # Install invenio-cli to the user, so everything is ready to develop.
+    # --no-warn-script-location is used since it's a false warning (due to sudo)
+    cd /home/vagrant
+    sudo --non-interactive --set-home --user vagrant -- /usr/bin/pip3 install --user --no-warn-script-location invenio-cli
+
+  SHELL
+
+  config.vm.post_up_message = "Your InvenioRDM development VM is ready to be used. It does not need to be restarted. invenio-cli is installed via pipenv at this point. Enjoy! (for more information see: https://inveniordm.docs.cern.ch/)"
+end
