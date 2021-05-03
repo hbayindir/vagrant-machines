@@ -86,15 +86,15 @@ Vagrant.configure(2) do |config|
     # Then install the basic packages that we need to work comfortably.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes vim git screen ncftp mc build-essential linux-headers-generic curl dkms
 
-    # We need Python 3.7.x to work reliably with the InvenioRDM. So let's get it.
-    add-apt-repository --yes --update ppa:deadsnakes/ppa
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7 python3-pip python3.7-dev libpython3.7-dev
-    
+    # We need python3-pip to get pip3. It's not installed out of the box.
+    # We're also adding some python3 development libraries since we need it.
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes python3-pip python3-dev libpython3-dev 
+ 
     # We need libcairo2 for developing invenio, so let's install it.
     DEBIAN_FRONTEND=noninteractive apt-get install --yes libcairo2
 
     # Install pipenv to the vagrant user's environment. We're going to need that.
-    sudo --non-interactive --set-home --user vagrant -- pip3 install pipenv
+    sudo --non-interactive --set-home --user vagrant -- pip3 install --user --no-warn-script-location pipenv
 
     # Next, install the docker engine (CE version).
     # Note: The process skips the packages already installed at this point.
@@ -122,10 +122,10 @@ Vagrant.configure(2) do |config|
 
     # Install the node 14.x from NodeSoruce binary distribution.
     curl --fail --silent --show-error --location "https://deb.nodesource.com/setup_14.x" | bash -
-    apt-get install --yes nodejs
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes nodejs
     
     # Downloading and installing things have ended, clean the downloaded packages.
-    apt-get clean
+    DEBIAN_FRONTEND=noninteractive apt-get clean
 
     # Install invenio-cli to the user, so everything is ready to develop.
     # --no-warn-script-location is used since it's a false warning (due to sudo)
