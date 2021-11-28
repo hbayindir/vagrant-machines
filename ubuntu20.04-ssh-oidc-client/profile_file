@@ -1,0 +1,6 @@
+# Make sure that OIDC-Agent works when we login.
+# File is stored in RAM for a moment, so it won't be a problem.
+# oidc-agent-service handles a lot automatically, so use that one.
+oidc-agent-service use > /dev/shm/oidc-agent-tmp
+source /dev/shm/oidc-agent-tmp
+rm /dev/shm/oidc-agent-tmp   
