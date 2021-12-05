@@ -80,10 +80,15 @@ Vagrant.configure(2) do |config|
     DEBIAN_FRONTEND=noninteractive apt-get --yes dist-upgrade
 
     # Then install the packages that we need to work with.
-    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen multitail ncftp mc build-essential linux-headers-amd64 rustc cargo rust-doc
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes vim screen multitail ncftp mc build-essential linux-headers-amd64 curl
 
     # Downloading and installing things have ended, clean the downloaded packages.
     DEBIAN_FRONTEND=noninteractive apt-get clean
+
+    # Install Rust programming language as the official website suggests.
+    sudo --non-interactive --set-home --user vagrant -- /usr/bin/curl --proto '=https' --tlsv1.2 --silent --show-error --fail https://sh.rustup.rs -o rustup.sh
+    sudo --non-interactive --set-home --user vagrant -- /bin/sh rustup.sh -y
+
    SHELL
 
    config.vm.post_up_message = "Your rust playground is ready, enjoy."
