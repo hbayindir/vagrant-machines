@@ -22,6 +22,7 @@ Currently contains the following VMs:
 - **debian-minikube-lab:** Debian Stretch 64bit which updates itself and installs latest [docker](https://www.docker.com/) and docker-compose from official repositories. Then, it adds minikube on top to form a wholly contained minikube playground. RAM is set to 6144MB (6.0GB) to make sure it can run some containers.
 - **debian-vsftpd-server:** Debian Bullseye 64bit which updates itself and installs `vsftpd` FTP daemon from official repositories. Can be used as an impromptu FTP server or just for experimentations. The server is not configured in any way. To start, add a user to the system via `adduser` and provide a password.
 - **ubuntu20.04-ssh-oidc-client:** Ubuntu 20.04LTS 64bit which updates itself and installs the [SSH-OIDC client](https://github.com/EOSC-synergy/ssh-oidc) by EOSC-Synergy. Used as a simple installation to test SSH-OIDC enabled servers around. A little more information can be found [here](http://ssh-oidc-demo.data.kit.edu/).
+- **debian-rust-playground:** Debian Bullseye 64bit which updates itself and installs `rustc`, `cargo` and `rust-doc` packages. Intended to be a lean but turnkey Rust development playground. This machine has 1024MB of RAM out of the box.
 
 ## Private IP List
 Following list contains the Private IP addresses of the host-only networking interfaces of the machines:
@@ -45,3 +46,4 @@ Following list contains the Private IP addresses of the host-only networking int
 - **debian-minikube-lab:** `192.168.56.81`
 - **debian-vsftpd-server:** `192.168.56.79`
 - **ubuntu20.04-ssh-oidc-client:** `192.168.56.78`
+- **debian-rust-playground:** `192.168.56.77`
