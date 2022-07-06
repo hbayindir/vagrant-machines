@@ -1,4 +1,7 @@
 # vagrant-machines
+
+**Important:** This repository has been migrated to [Source Hut](https://git.sr.ht/~bayindirh/vagrant-machines). This repository is archived for preservation purposes.
+
 Contains commonly used Vagrant machine definitions to easily create VMs ready for development.
 
 Otherwise noted, all VMs have virtual networking IPs, run on VirtIO network cards and updates themselves to latest version of the OS automatically. For automatic installation of VirtualBox guest additions, please use `vagrant-vbguest` plugin.
